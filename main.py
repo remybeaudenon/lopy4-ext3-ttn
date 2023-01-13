@@ -1,91 +1,85 @@
-from network import LoRa
-import socket
-import time
-from struct import pack
-import struct
-import ubinascii
-import binascii
-import pycom
+import time,sys,os
+from ws2812led import LED
+from lm335a import LM335A
+from lora import LORAWAN
+from logger import  LOGGER
 
-def connect_to_ttn(lora_object):
-    """Receives a lora object and tries to join"""
-    # join a network using OTAA (Over the Air Activation),
-    # choose dr = 0 if the gateway is not close to your device, try different dr if needed
-    lora_object.join(activation=LoRa.OTAA, auth=(dev_eui, app_eui, app_key), timeout=0, dr=0)
-    # wait until the module has joined the network
-    pycom.rgbled(0x7f7f00) #yellow
-    while not lora_object.has_joined():
-        time.sleep(2.5)
-        print('Not yet joined...')
-        lora.nvram_erase()
-        
+__version__ = "V0.1-1"
 
-def getHexPayload( json) :
-    payload = bytearray(0)
+LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
 
-    if 'event' in json :  
-        payload.extend( bytearray( b'\x01' +  pack('s',json.get('event')) ))
-    if 'default' in json :  
-        error_code = json.get('default')
-        payload.extend( bytearray( b'\x03' +  pack('B', error_code )))
-        if error_code == 0  and 'temp' in json : 
-            temp = int( json.get('temp') * 10 )
-            payload.extend( bytearray( b'\x02' +  pack('<H',temp) ))  # little-endian 
-    return payload 
+#  --- Functions   ---
+def log(header , msg ) : 
+    print('{:<32} - {} '.format(header,msg)  ) 
 
+#  --- Initialization objects   ---
 
-pycom.heartbeat(False)
+led = LED()
+lorawan = LORAWAN() 
+sensor1 = LM335A('sensor1','P16', 10)         # Pin  Sampling read 10 sec. 
 
+led.setState(LED.BLUE)  
+lorawan.join() 
+while not lorawan.has_joined() :
+    time.sleep(5)
 
-#-- HUA-RT Setup 
-app_eui = ubinascii.unhexlify('a2-6c-05-58-7f-96-cc-6a'.replace('-',''))
-app_key = ubinascii.unhexlify('0a-3f-dd-ce-8e-29-f3-ba-a9-9a-d0-a4-65-87-ef-be'.replace('-',''))
+led.setState(LED.GREEN)   
+LOGGER.log('MAIN:main()','Loop Started !!!'  ) 
 
-#-- TTN-KL setup  
-#app_eui = ubinascii.unhexlify('45-43-4F-4C-45-49-4F-54'.replace('-',''))
-#app_key = ubinascii.unhexlify('63-96-54-A5-3C-CC-7B-75-5A-8D-53-27-54-C8-42-22'.replace('-',''))
+delta_temp = 0.5 # ° 
+temp_last = 0 
+default_last = 0
 
-pycom.rgbled(0xff0000) #red
-time.sleep(1)
+ping_activity   = 0 
+ping_delay      = 3600  
 
-lora = LoRa(mode=LoRa.LORAWAN, region=LoRa.EU868, device_class=LoRa.CLASS_C)
+sleep_delay = 10 
 
-#uncomment to use LoRaWAN application provided dev_eui
-#dev_eui = ubinascii.unhexlify('----------------') # replace the dash by the DevEUI provided to TTN
-dev_eui =  binascii.hexlify(lora.mac()).upper()
+try :
+    while True :
 
-# DevEUI :  b'70B3D5499050BFC1'
-print('DevEUI : ', dev_eui)
-lora.nvram_restore() #if there is nothing to restore it will return a False
+        if not sensor1.isReady() : 
+            time.sleep(sleep_delay)
+            led.setState(LED.YELLOW) 
+            continue
+        # Application Logic 
+        payload = sensor1.getPayload()
+        temp_value = payload.get('temp')
+        default = payload.get('default')
 
-connect_to_ttn(lora)
+        # 'E'vent on default 
+        if ( default ^ default_last ) :
+            default_last = default
+            LOGGER.log('MAIN:main()','New push default: {}'.format(default) ) 
+            # Push data 
+            lorawan.send(LM335A.getHexPayload(payload))
+            ping_activity = 0 
+        elif abs(temp_value - temp_last)  > delta_temp :
+            temp_last = temp_value 
+            LOGGER.log('MAIN:main()','Sensor new push value: {}'.format(temp_value) )
+            # Push data  
+            lorawan.send(LM335A.getHexPayload(payload))
+            ping_activity = 0 
+    
+        elif ping_activity > ping_delay : 
+            payload['event'] = 'P'
+            LOGGER.log('MAIN:main()','Sensor new push "Ping activity" : {}'.format(payload) )
+            # Push data  
+            lorawan.send(LM335A.getHexPayload(payload))
+            ping_activity = 0 
+    
+        else :
+            LOGGER.log('MAIN:main()','Sensor temp. old:{} new:{}'.format(temp_last,temp_value) ) 
+            ping_activity += sleep_delay
+            time.sleep(sleep_delay)
 
-print("CONNECTED!!")
-pycom.rgbled(0x00ff00) #green
+        led.setState(LED.GREEN) 
+except Exception as err:
+    LOGGER.log('MAIN:main()','Exception  {}'.format(err)) 
+    LOGGER.log('MAIN:main()','stack trace {}'.format(sys.print_exception(err)) ) 
 
-print('LoRa stats : {} '.format(lora.stats() ) ) 
+finally :
+    led.setState(LED.OFF)
+    sensor1.__del__() 
 
-# create a LoRa socket
-s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
-
-# set the LoRaWAN data rate
-s.setsockopt(socket.SOL_LORA, socket.SO_DR, 0)
-
-# make the socket blocking
-s.setblocking(True)
-
-for i in range (5):
-
-    payload = { 'event': 'E' ,'temp': 18.5 ,'default' : 0x00  }
-    pkt = getHexPayload(payload)
-    print('Sending:', pkt)
-    s.send(pkt)
-    time.sleep(4)
-    # without downlink transmission first
-    #rx, port = s.recvfrom(256)
-    #if rx:
-    #    print('Received: {}, on port: {}'.format(rx, port))
-    print('LoRa stats : {} '.format(lora.stats() ) ) 
-
-    time.sleep(26)
 
