@@ -1,7 +1,8 @@
 import time,sys,os
 from ws2812led import LED
 from lm335a import LM335A
-from lora import LORAWAN
+from lora import LoRaWAN
+
 from logger import  LOGGER
 
 __version__ = "V0.1-1"
@@ -15,7 +16,9 @@ def log(header , msg ) :
 #  --- Initialization objects   ---
 
 led = LED()
-lorawan = LORAWAN() 
+lorawan = LoRaWAN() 
+#sys.exit()
+
 sensor1 = LM335A('sensor1','P16', 10)         # Pin  Sampling read 10 sec. 
 
 led.setState(LED.BLUE)  
