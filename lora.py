@@ -55,7 +55,7 @@ class LoRaWAN(LoRa) :
     def send(self, telegram) : 
 
         if isinstance(telegram, bytearray) or isinstance(telegram, bytes) :
-            if len(telegram) < LORAWAN.PAYLOAD_MAX_SIZE :
+            if len(telegram) < LoRaWAN.PAYLOAD_MAX_SIZE :
                 LOGGER.log('LoRaWAN:send()','Push LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
                 LED.getInstance().setState(LED.RED)
                 self.socket.setblocking(True)
