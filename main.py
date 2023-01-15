@@ -8,7 +8,7 @@
 import time,sys,os
 from ws2812led import LED
 from lm335a import LM335A
-from lora import LoRaWAN
+from lorawan import LoRaWAN
 
 from logger import  LOGGER
 
