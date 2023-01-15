@@ -6,19 +6,16 @@
     Date         : 01/2023 
 """
 import time,sys,os
+
 from ws2812led import LED
 from lm335a import LM335A
 from lorawan import LoRaWAN
-
 from logger import  LOGGER
 
 __version__ = "V0.1-2"
-
 LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
 
 #  --- Functions   ---
-def log(header , msg ) : 
-    print('{:<32} - {} '.format(header,msg)  ) 
 
 #  --- Initialization objects   ---
 led = LED()
