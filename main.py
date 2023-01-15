@@ -5,7 +5,7 @@ from lora import LoRaWAN
 
 from logger import  LOGGER
 
-__version__ = "V0.1-1"
+__version__ = "V0.1-2"
 
 LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
 
