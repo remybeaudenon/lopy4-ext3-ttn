@@ -8,7 +8,7 @@ import binascii,ubinascii
 
 
 class LoRaWAN(LoRa) : 
-
+    """ Dedicated LoRaWan instance for HUA+Multitech Hub  """
     PAYLOAD_MAX_SIZE = 12 
 
     #-- HUA-RT Setup 
@@ -28,7 +28,6 @@ class LoRaWAN(LoRa) :
 
         # DevEUI :  70-b3-d5-49-98-fa-f7-0f
         LOGGER.log('LoRaWAN:init()','DevEUI : {}'.format(self.dev_eui)) 
-        # super().nvram_save() # if there is nothing to restore it will return a False
 
     def join(self) : 
 
@@ -45,10 +44,8 @@ class LoRaWAN(LoRa) :
         # create a LoRa socket
         self.socket = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
         self.socket.settimeout(3)
-
         # set the LoRaWAN data rate
         self.socket.setsockopt(socket.SOL_LORA, socket.SO_DR, 0)
-
         # selecting non-confirmed type of messages
         self.socket.setsockopt(socket.SOL_LORA, socket.SO_CONFIRMED, False)
 
@@ -65,8 +62,9 @@ class LoRaWAN(LoRa) :
                 lg = self.socket.send(telegram)
                 self.socket.setblocking(False)
 
+                # LoRa Duty cycle applied 
                 LED.getInstance().setState(LED.INDIGO)
-                time.sleep(60) #  LorA duty cycle 
+                time.sleep(60)  
 
             else : 
                 LOGGER.log('LoRaWAN:send()','ERROR!! Payload size error : {}'.format(len(telegram)  ) ) 

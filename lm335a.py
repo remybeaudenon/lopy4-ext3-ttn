@@ -14,7 +14,7 @@ from struct import pack
 from logger import  LOGGER
 
 class LM335A : 
-
+    """ LM335A Temperatrue Sensor Class  """
     class StackData : 
         SIZE = 10 
         

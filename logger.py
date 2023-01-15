@@ -1,6 +1,6 @@
 import utime
 class LOGGER :
-    
+    """ Logger Static Class  """
     @staticmethod 
     def log(header , msg ) : 
         lt  = utime.localtime()

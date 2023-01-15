@@ -3,7 +3,6 @@ from time import sleep_ms
 from logger import  LOGGER
 
 class LED : 
-
     """RGB Led object functions """   # __doc__ value
     RED  = 0xFF0000
     ORANGE = 0xFFA500

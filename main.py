@@ -1,3 +1,10 @@
+"""
+    POLYTEC - ecoleiot.fr
+    Project      : FullStack TP   
+    Application  : LM335A Temperature sensor on HUA+LoRa Mutlitech gateway  
+    Auth         : remybeaudenon@yahoo.com                 
+    Date         : 01/2023 
+"""
 import time,sys,os
 from ws2812led import LED
 from lm335a import LM335A
@@ -14,11 +21,8 @@ def log(header , msg ) :
     print('{:<32} - {} '.format(header,msg)  ) 
 
 #  --- Initialization objects   ---
-
 led = LED()
 lorawan = LoRaWAN() 
-#sys.exit()
-
 sensor1 = LM335A('sensor1','P16', 10)         # Pin  Sampling read 10 sec. 
 
 led.setState(LED.BLUE)  
@@ -38,6 +42,7 @@ ping_delay      = 3600
 
 sleep_delay = 10 
 
+# ----- Loop Business functions ----- 
 try :
     while True :
 
