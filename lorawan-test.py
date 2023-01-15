@@ -1,3 +1,5 @@
+# >exec(open('lorawan-test.py').read())
+
 from network import LoRa
 import socket
 import time
