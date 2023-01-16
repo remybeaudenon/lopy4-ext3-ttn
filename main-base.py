@@ -9,6 +9,7 @@
 # -- Import section 
 from logger import  LOGGER
 from lorawan import LoRaWAN
+import time
 
 __version__ = "V0.1-2"
 LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
@@ -31,11 +32,8 @@ try :
     while True :
         # --- Process function ---  
 
-        LOGGER.log('MAIN:process()',' c'' dans l''effort que l''on trouve la satisfaction !!!'  ) 
-
-        pass
-
-
+        LOGGER.log('MAIN:process()',"C'est dans l'effort que l'on trouve la satisfaction !!!"  ) 
+        time.sleep(5)
 
         # --------------------------
 except Exception as err:

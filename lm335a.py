@@ -78,6 +78,9 @@ class LM335A :
 
         if (self.default == 0 ) : 
             self.stack.push(self.value)
+        else : 
+            LOGGER.log('LM335A:read()','ERROR: default:{}'.format(self.default) )
+
 
     def getPayload(self, event = 'E') : 
         return { 'event': event ,'temp': self.stack.getAvgValue() ,'default' : self.default }

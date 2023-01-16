@@ -12,7 +12,7 @@ from lm335a import LM335A
 from lorawan import LoRaWAN
 from logger import  LOGGER
 
-__version__ = "V0.1-2"
+__version__ = "V0.1-3"
 LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
 
 #  --- Functions   ---
