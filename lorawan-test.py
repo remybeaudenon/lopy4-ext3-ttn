@@ -42,7 +42,9 @@ s.setsockopt(socket.SOL_LORA, socket.SO_DR, 5)
 s.setblocking(True)
 
 # send some data
-s.send(bytes([0x01, 0x02, 0x03]))
+print('send data..[123]')
+rc = s.send(b'123')
+print('sent {} bytes'.format(rc))
 
 # make the socket non-blocking
 # (because if there's no data received it will block forever...)

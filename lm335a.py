@@ -17,7 +17,6 @@ class LM335A :
     """ LM335A Temperatrue Sensor Class  """
     class StackData : 
         SIZE = 10 
-        
         def __init__(self):
             self.buffer = []    
             LOGGER.log('LM335A:StackData:init()','buffer: {}'.format(self.buffer))
