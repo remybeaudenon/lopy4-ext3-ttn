@@ -30,6 +30,9 @@ LOGGER.log('MAIN:main()','Loop Started !!!'  )
 try :
     while True :
         # --- Process function ---  
+
+        LOGGER.log('MAIN:process()',' c'' dans l''effort que l''on trouve la satisfaction !!!'  ) 
+
         pass
 
 
