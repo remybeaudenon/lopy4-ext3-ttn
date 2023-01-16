@@ -40,11 +40,16 @@ class LM335A :
         def isReady(self) :
             return (len(self.buffer) >= LM335A.StackData.SIZE )
 
+    DELTA_TEMP = 0.5 # ° 
+
     def __init__(self, name, pin , sampling_point = 10 ):
 
         self.name = name
         self.value = 0.0
         self.default = 0
+
+        self.value_last = self.value
+        self.default_last = self.default
 
         self.adc =  ADC() 
         self.sensor = self.adc.channel(pin=pin,attn=ADC.ATTN_11DB)  
@@ -81,6 +86,22 @@ class LM335A :
         else : 
             LOGGER.log('LM335A:read()','ERROR: default:{}'.format(self.default) )
 
+    def process(self) : 
+
+        if not self.isReady() :
+            return None 
+        
+        # 'E'vent on default 
+        if ( self.default ^ self.default_last ) :
+            self.default_last = self.default
+            LOGGER.log('LM335A:process()','New default: {}'.format(self.default) ) 
+            return self.getPayload()
+        elif abs(self.value - self.value_last)  > LM335A.DELTA_TEMP :
+            self.value_last = self.value 
+            LOGGER.log('LM335A:process()','Sensor new Temp. value: {}'.format(self.value) )
+            return self.getPayload()
+        else : 
+            return None
 
     def getPayload(self, event = 'E') : 
         return { 'event': event ,'temp': self.stack.getAvgValue() ,'default' : self.default }
