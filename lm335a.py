@@ -96,7 +96,7 @@ class LM335A :
             self.default_last = self.default
             LOGGER.log('LM335A:process()','New default: {}'.format(self.default) ) 
             return self.getPayload()
-        elif abs(self.value - self.value_last)  > LM335A.DELTA_TEMP :
+        elif abs(self.stack.getAvgValue() - self.value_last)  >= LM335A.DELTA_TEMP :
             self.value_last = self.value 
             LOGGER.log('LM335A:process()','Sensor new Temp. value: {}'.format(self.value) )
             return self.getPayload()

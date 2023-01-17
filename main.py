@@ -7,12 +7,14 @@
 """
 import time,sys,os
 
+# application package 
 from ws2812led import LED
 from lm335a import LM335A
+from tc74 import TC74
 from lorawan import LoRaWAN
 from logger import  LOGGER
 
-__version__ = "V0.1-4"
+__version__ = "V0.1-5"
 LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
 
 #  --- Functions   ---
@@ -20,14 +22,15 @@ LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>
 #  --- Initialization objects   ---
 led = LED()
 lorawan = LoRaWAN() 
-sensor1 = LM335A('sensor1','P16', 10)         # Pin  Sampling read 10 sec. 
+
+sensor1 = LM335A('sensor lm335A','P16', 10)         # Pin  Sampling read 10 sec. 
+#sensor1 = TC74('sensor tc74')         # Pin  Sampling read 10 sec. 
 
 led.setState(LED.BLUE)  
 lorawan.join() 
 while not lorawan.has_joined() :
     time.sleep(5)
 
-led.setState(LED.GREEN)   
 LOGGER.log('MAIN:main()','Loop Started !!!'  ) 
 
 ping_activity   = 0 
@@ -41,21 +44,21 @@ try :
 
         # Skip if not ready 
         if not sensor1.isReady() : 
-            time.sleep(sleep_delay)
             led.setState(LED.YELLOW) 
+            time.sleep(sleep_delay)
             continue
 
         #  Process sensor activities 
         payload  = sensor1.process()
         if isinstance(payload, dict) :    
             # Push data 
-            lorawan.send(LM335A.getHexPayload(payload))
+            lorawan.send(sensor1.getHexPayload(payload))
             ping_activity = 0 
         elif ping_activity > ping_delay : 
             payload['event'] = 'P'
             LOGGER.log('MAIN:main()','Sensor new push "Ping activity" : {}'.format(payload) )
             # Push data  
-            lorawan.send(LM335A.getHexPayload(payload))
+            lorawan.send(sensor1.getHexPayload(payload))
             ping_activity = 0 
     
         else :
