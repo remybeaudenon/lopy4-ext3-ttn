@@ -24,7 +24,7 @@ class LoRaWAN(LoRa) :
         self.socket = None 
 
         # Init LoRa Mode & Region 
-        LoRa(mode=LoRa.LORAWAN, region=LoRa.EU868)
+        LoRa(mode=LoRa.LORAWAN, region=LoRa.EU868,adr=True)
 
         #uncomment to use LoRaWAN application provided dev_eui
         #dev_eui = ubinascii.unhexlify('----------------') # replace the dash by the DevEUI provided.

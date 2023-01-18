@@ -14,7 +14,7 @@ from tc74 import TC74
 from lorawan import LoRaWAN
 from logger import  LOGGER
 
-__version__ = "V0.1-5"
+__version__ = "V0.1-6"
 LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
 
 #  --- Functions   ---
@@ -23,8 +23,8 @@ LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>
 led = LED()
 lorawan = LoRaWAN() 
 
-sensor1 = LM335A('sensor lm335A','P16', 10)         # Pin  Sampling read 10 sec. 
-#sensor1 = TC74('sensor tc74')         # Pin  Sampling read 10 sec. 
+#sensor1 = LM335A('sensor lm335A','P16', 10)         # Pin  Sampling read 10 sec. 
+sensor1 = TC74('sensor tc74')         # Pin  Sampling read 10 sec. 
 
 led.setState(LED.BLUE)  
 lorawan.join() 
@@ -55,6 +55,7 @@ try :
             lorawan.send(sensor1.getHexPayload(payload))
             ping_activity = 0 
         elif ping_activity > ping_delay : 
+            payload = sensor1.getPayload()
             payload['event'] = 'P'
             LOGGER.log('MAIN:main()','Sensor new push "Ping activity" : {}'.format(payload) )
             # Push data  
