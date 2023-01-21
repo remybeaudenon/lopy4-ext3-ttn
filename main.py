@@ -73,8 +73,9 @@ try :
             LOGGER.log('MAIN:main()','Sensor activity: {}'.format(payload) ) 
             ping_activity += sleep_delay
             time.sleep(sleep_delay)
-
         led.setState(LED.GREEN) 
+
+
 except Exception as err:
     LOGGER.log('MAIN:main()','Exception  {}'.format(err)) 
     LOGGER.log('MAIN:main()','stack trace {}'.format(sys.print_exception(err)) ) 

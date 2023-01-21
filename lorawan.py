@@ -52,7 +52,7 @@ class LoRaWAN(LoRa) :
 
 
         if  try_index == 0 : 
-            LOGGER.log('LoRaWAN:join()','Error Gateway Join() MODE SIMULATION activé !!! ') 
+            LOGGER.log('LoRaWAN:join()','Error Gateway Join() MODE SIMULATION activated!!! ') 
             self.setSimulation(True)
         else :
 
@@ -79,6 +79,11 @@ class LoRaWAN(LoRa) :
 
             if self.simulation : 
                 LOGGER.log('LoRaWAN:send()','Push  SIMULATION LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
+                LED.getInstance().setState(LED.RED)
+                time.sleep(2)  
+                # LoRa Duty cycle applied 
+                LED.getInstance().setState(LED.INDIGO)
+                time.sleep(30)  
 
             elif len(telegram) < LoRaWAN.PAYLOAD_MAX_SIZE :
                 LOGGER.log('LoRaWAN:send()','Push LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
