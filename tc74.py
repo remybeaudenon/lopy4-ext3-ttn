@@ -13,7 +13,8 @@
 """
 
 import utime
-from machine import Timer
+from machine import Timer,I2C, Pin
+
 from struct import pack
 from logger import  LOGGER
 
@@ -69,12 +70,12 @@ class TC74 :
         def isReady(self) :
             return (len(self.buffer) >= TC74.StackData.SIZE )
 
-    DELTA_TEMP = 0.5 # ° 
+    DELTA_TEMP      = 0.5 # ° 
+    I2C_FREQUENCE   = 400000
+    VARIANT         = ENUM_VARIANT
+    UNIT            = ENUM_UNIT
 
-    VARIANT = ENUM_VARIANT
-    UNIT = ENUM_UNIT
-
-    def __init__(self,name='tc74', variant = ENUM_VARIANT.A0,sampling_point = 10):
+    def __init__(self, sda , scl, name='tc74', variant = VARIANT.A0,sampling_point = 10):
         self.name = name
         self.value = 0.0
         self.default = 0
@@ -83,24 +84,16 @@ class TC74 :
         self.default_last = self.default
 
         self.variant = variant
-        self.i2c = None
+        self.i2c = I2C(I2C.MASTER, pins = (sda,scl) , baudrate = TC74.I2C_FREQUENCE) # pins (P9=SDA, P10=SCL) 
         
         self.stack = TC74.StackData()
         self.__alarm = Timer.Alarm(self._top_handler, sampling_point , periodic=True)
-        LOGGER.log('TC74:init()','name:{} variant:{} sampling:{} '.format(name,hex(variant),sampling_point) )
-
-    def init(self, scl= 'P10', sda= 'P9', freq = 400000):
-        from machine import I2C, Pin
-
-        self.i2c = I2C(0, pins =(sda , scl ))
-        self.i2c.init(I2C.MASTER, baudrate = freq )
-
-        self.disable_standby()
+        LOGGER.log('TC74:init()','name:{} variant:{} sampling:{} '.format(name,hex(variant), sampling_point) )
 
     def _top_handler(self, alarm) : 
 
-        if self.i2c == None : 
-            self.init()
+        if not self.is_data_ready() : 
+            self.disable_standby()
         self.read()
 
     def __del__(self) :
@@ -114,10 +107,15 @@ class TC74 :
         """ Read temperature value from TEMPERATURE register """
         if self.i2c is None:
             raise TypeError("i2c is not defined did you call the init method?")
-        data = self.i2c.readfrom_mem(self.variant,_TEMP_REG, 1)
-        value  = self._extract_value_from_buffer(int(data[0]), ENUM_UNIT.Celsius)
-        self.value = float(value)
-        self.default = 0x0 
+
+        try :    
+            data = self.i2c.readfrom_mem(self.variant,_TEMP_REG, 1)
+            value  = self._extract_value_from_buffer(int(data[0]), ENUM_UNIT.Celsius)
+            self.value = float(value)
+            self.default = 0x0 
+        except(OSError) as err : 
+            self.default = 0x08    
+
         self.default = self.default | ( self.value > 35.0 ) << 1 
         self.default = self.default | ( self.value <  5.0 ) << 2  
 
@@ -151,8 +149,11 @@ class TC74 :
 
     def is_data_ready(self):
         """ Check if chip is  data ready  """
-        data = self.i2c.readfrom_mem(self.variant,_CFG_REG, 1)
-        return (data[0] == 0x40 )
+        try:
+            data = self.i2c.readfrom_mem(self.variant,_CFG_REG, 1)
+            return (data[0] == 0x40 )
+        except(OSError) as err:
+            return 0 
 
     def is_standby(self):
         """ Check if chip is in standby mode """

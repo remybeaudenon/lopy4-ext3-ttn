@@ -5,7 +5,6 @@
     Auth         : remybeaudenon@yahoo.com                 
     Date         : 01/2023 
 """
-
 # -- Import section 
 from logger import  LOGGER
 from lorawan import LoRaWAN
@@ -31,15 +30,11 @@ LOGGER.log('MAIN:main()','Loop Started !!!'  )
 try :
     while True :
         # --- Process function ---  
-
         LOGGER.log('MAIN:process()',"C'est dans l'effort que l'on trouve la satisfaction !!!"  ) 
         time.sleep(5)
-
         # --------------------------
 except Exception as err:
     LOGGER.log('MAIN:main()','Exception  {}'.format(err)) 
 
 finally :
     LOGGER.log('MAIN:main()','<<<--- END PROGRAM --->>>')
-
-

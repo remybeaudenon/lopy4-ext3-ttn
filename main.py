@@ -9,27 +9,34 @@ import time,sys,os
 
 # application package 
 from ws2812led import LED
-from lm335a import LM335A
-from tc74 import TC74
-from lorawan import LoRaWAN
+from lorawan import LoRaWAN, ENUM_GATEWAY
 from logger import  LOGGER
 
-__version__ = "V0.1-6"
+__version__ = "V0.2-0"
 LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
+
+# --- Capteur Type 
+class ENUM_TP:
+    TC47    = True
+    LM335A  = False
 
 #  --- Functions   ---
 
 #  --- Initialization objects   ---
 led = LED()
+#lorawan = LoRaWAN(ENUM_GATEWAY.HUA[0]) 
 lorawan = LoRaWAN() 
 
-#sensor1 = LM335A('sensor lm335A','P16', 10)         # Pin  Sampling read 10 sec. 
-sensor1 = TC74('sensor tc74')         # Pin  Sampling read 10 sec. 
+# --- TP Sensor instanciation  ---  
+if ENUM_TP.LM335A :
+    from lm335a import LM335A 
+    sensor1 = LM335A('sensor lm335A','P16', 10) # Pin  Sampling read 10 sec. 
+elif ENUM_TP.TC47 :
+    from tc74 import TC74
+    sensor1 = TC74('P9','P10','sensor tc74')    # Pin  default Sampling read 10 sec. 
 
 led.setState(LED.BLUE)  
-lorawan.join() 
-while not lorawan.has_joined() :
-    time.sleep(5)
+lorawan.join(ENUM_GATEWAY.TTN) 
 
 LOGGER.log('MAIN:main()','Loop Started !!!'  ) 
 
