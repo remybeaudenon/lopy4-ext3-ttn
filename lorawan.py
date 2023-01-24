@@ -9,6 +9,8 @@ import binascii,ubinascii
 class ENUM_GATEWAY : 
     HUA = ('HUA','a2-6c-05-58-7f-96-cc-6a','0a-3f-dd-ce-8e-29-f3-ba-a9-9a-d0-a4-65-87-ef-be') # EUI, KEY 
     TTN = ('TTN','45-43-4F-4C-45-49-4F-54','0a-3f-dd-ce-8e-29-f3-ba-a9-9a-d0-a4-65-87-ef-be') # 
+    PLA = ('PLA','3a-35-82-19-8f-0d-95-4d','81-d8-0e-e8-26-50-ad-29-82-b1-0e-37-db-ac-d6-6e') # 
+
 _GTW_NAME       = 0
 _GTW_APP_EUI    = 1
 _GTW_APP_KEY    = 2
@@ -48,7 +50,7 @@ class LoRaWAN(LoRa) :
             time.sleep(5)
             LOGGER.log('LoRaWAN:join()','Not yet joined awaiting..{} gateway try:{}'.format(gateway_code,try_index))
             try_index -=1
-        time.sleep(1)
+        time.sleep(3)
 
         if  try_index == 0 : 
             LOGGER.log('LoRaWAN:join()','Error Gateway Join() MODE SIMULATION activated!!! ') 
