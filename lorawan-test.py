@@ -15,12 +15,12 @@ lora = LoRa(mode=LoRa.LORAWAN, region=LoRa.EU868,adr=True)
 
 # create an OTAA authentication parameters, change them to the provided credentials
 #-- HUA-RT Setup 
-app_eui = ubinascii.unhexlify('a2-6c-05-58-7f-96-cc-6a'.replace('-',''))
-app_key = ubinascii.unhexlify('0a-3f-dd-ce-8e-29-f3-ba-a9-9a-d0-a4-65-87-ef-be'.replace('-',''))
+#app_eui = ubinascii.unhexlify('a2-6c-05-58-7f-96-cc-6a'.replace('-',''))
+#app_key = ubinascii.unhexlify('0a-3f-dd-ce-8e-29-f3-ba-a9-9a-d0-a4-65-87-ef-be'.replace('-',''))
 
 #-- TTN Polytech Gallile 
-#app_eui = ubinascii.unhexlify('45-43-4F-4C-45-49-4F-54'.replace('-',''))
-#app_key = ubinascii.unhexlify('0a-3f-dd-ce-8e-29-f3-ba-a9-9a-d0-a4-65-87-ef-be'.replace('-',''))
+app_eui = ubinascii.unhexlify('45-43-4F-4C-45-49-4F-54'.replace('-',''))
+app_key = ubinascii.unhexlify('0a-3f-dd-ce-8e-29-f3-ba-a9-9a-d0-a4-65-87-ef-be'.replace('-',''))
 
 dev_eui =  binascii.hexlify(lora.mac())
 

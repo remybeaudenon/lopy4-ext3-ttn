@@ -58,7 +58,7 @@ class TC74 :
                 if len(self.buffer) >= TC74.StackData.SIZE : 
                     self.buffer.pop(0)       
                 self.buffer.append(value)
-                LOGGER.log('TC74:StackData:push()','value:{} buffer:{}'.format(value, self.buffer))
+                LOGGER.log('TC74:StackData:push()','input value:{} buffer:{} ==> avg:{} '.format(value, self.buffer,self.getAvgValue()))
 
         def getAvgValue(self):
             items = len(self.buffer) 
@@ -169,19 +169,22 @@ class TC74 :
     def process(self) : 
 
         if not self.isReady() :
-            return None 
-        
+            return None
+
+        payload = self.getPayload()
+        avg_temp_value = payload['temp']     
         # 'E'vent on default 
         if ( self.default ^ self.default_last ) :
             self.default_last = self.default
             LOGGER.log('TC74:process()','New default: {}'.format(self.default) ) 
-            return self.getPayload()
-        elif abs(self.stack.getAvgValue() - self.value_last)  >= TC74.DELTA_TEMP :
-            self.value_last = self.value 
-            LOGGER.log('TC74:process()','Sensor new Temp. value: {}'.format(self.value) )
-            return self.getPayload()
+            return payload
+        elif abs(avg_temp_value - self.value_last)  >= TC74.DELTA_TEMP :
+            self.value_last = avg_temp_value
+            LOGGER.log('TC74:process()','Sensor new Temp. value: {}'.format(avg_temp_value) )
+            return payload
         else : 
-            return None
+            return 'avg_temp_value:{} value_last:{} hysteresis:{}'.format(avg_temp_value,self.value_last,TC74.DELTA_TEMP)
+
 
     def getPayload(self, event = 'E') : 
         return { 'event': event ,'temp': self.stack.getAvgValue() ,'name':self.name ,'default' : self.default }

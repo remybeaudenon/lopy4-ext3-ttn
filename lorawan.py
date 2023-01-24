@@ -50,10 +50,11 @@ class LoRaWAN(LoRa) :
             try_index -=1
         time.sleep(1)
 
-
         if  try_index == 0 : 
             LOGGER.log('LoRaWAN:join()','Error Gateway Join() MODE SIMULATION activated!!! ') 
             self.setSimulation(True)
+            LED.getInstance().pulse(LED.RED,3000)
+
         else :
 
             LOGGER.log('LoRaWAN:join()','CONNECTED !! to LoRa station ' ) 
@@ -73,13 +74,16 @@ class LoRaWAN(LoRa) :
         LOGGER.log('LoRaWAN:setSimulation()','MODE SIMULATION activé !!! ') 
         self.simulation = state    
 
+    def isInSimulation(self) : 
+        return  (self.simulation == True )     
+
     def send(self, telegram) : 
 
         if isinstance(telegram, bytearray) or isinstance(telegram, bytes) :
 
             if self.simulation : 
                 LOGGER.log('LoRaWAN:send()','Push  SIMULATION LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
-                LED.getInstance().setState(LED.RED)
+                LED.getInstance().setState(LED.CYAN)
                 time.sleep(2)  
                 # LoRa Duty cycle applied 
                 LED.getInstance().setState(LED.INDIGO)
@@ -87,7 +91,7 @@ class LoRaWAN(LoRa) :
 
             elif len(telegram) < LoRaWAN.PAYLOAD_MAX_SIZE :
                 LOGGER.log('LoRaWAN:send()','Push LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
-                LED.getInstance().setState(LED.RED)
+                LED.getInstance().setState(LED.CYAN)
                 self.socket.setblocking(True)
                 lg = self.socket.send(telegram)
                 self.socket.setblocking(False)

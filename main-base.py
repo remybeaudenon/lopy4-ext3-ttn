@@ -36,7 +36,7 @@ elif ENUM_TP.TC47 :
     sensor1 = TC74('P9','P10','sensor tc74')    # Pin  default Sampling read 10 sec. 
 
 led.setState(LED.BLUE)  
-lorawan.join(ENUM_GATEWAY.HUA) 
+lorawan.join(ENUM_GATEWAY.TTN) 
 
 LOGGER.log('MAIN:main()','Loop Started !!!'  ) 
 
@@ -49,32 +49,15 @@ sleep_delay = 10
 try :
     while True :
 
-        # Skip if not ready 
-        if not sensor1.isReady() : 
-            led.setState(LED.YELLOW) 
-            time.sleep(sleep_delay)
-            continue
+        """  Votre Code ici 
+        
 
-        #  Process sensor activities 
-        payload  = sensor1.process()
-        if isinstance(payload, dict) :    
-            # Push data 
-            lorawan.send(sensor1.getHexPayload(payload))
-            ping_activity = 0 
-        elif ping_activity > ping_delay : 
-            payload = sensor1.getPayload()
-            payload['event'] = 'P'
-            LOGGER.log('MAIN:main()','Sensor new push "Ping activity" : {}'.format(payload) )
-            # Push data  
-            lorawan.send(sensor1.getHexPayload(payload))
-            ping_activity = 0 
-    
-        else :
-            LOGGER.log('MAIN:main()','Sensor activity: {}'.format(payload) ) 
-            ping_activity += sleep_delay
-            time.sleep(sleep_delay)
 
+        """   
         led.setState(LED.GREEN) 
+        time.sleep(sleep_delay)
+
+
 except Exception as err:
     LOGGER.log('MAIN:main()','Exception  {}'.format(err)) 
     LOGGER.log('MAIN:main()','stack trace {}'.format(sys.print_exception(err)) ) 
