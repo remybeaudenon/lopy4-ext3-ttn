@@ -12,7 +12,7 @@ from ws2812led import LED
 from lorawan import LoRaWAN, ENUM_GATEWAY
 from logger import  LOGGER
 
-__version__ = "V0.2-0"
+__version__ = "V1.0-0"
 LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
 
 # --- Capteur Type 
@@ -36,7 +36,7 @@ elif ENUM_TP.TC47 :
     sensor1 = TC74('P9','P10','sensor tc74')    # Pin  default Sampling read 10 sec. 
 
 led.setState(LED.BLUE)  
-lorawan.join(ENUM_GATEWAY.TTN) 
+lorawan.join(ENUM_GATEWAY.HUA) 
 
 LOGGER.log('MAIN:main()','Loop Started !!!'  ) 
 
@@ -59,6 +59,7 @@ try :
         payload  = sensor1.process()
         if isinstance(payload, dict) :    
             # Push data 
+            LOGGER.log('MAIN:main()','Sensor new push "Event activity" : {}'.format(payload) )
             lorawan.send(sensor1.getHexPayload(payload))
             ping_activity = 0 
         elif ping_activity > ping_delay : 
@@ -70,10 +71,15 @@ try :
             ping_activity = 0 
     
         else :
-            LOGGER.log('MAIN:main()','Sensor activity: {}'.format(payload) ) 
+            LOGGER.log('MAIN:main()','Sensor low temp. variation: {}'.format(payload) ) 
             ping_activity += sleep_delay
             time.sleep(sleep_delay)
-        led.setState(LED.GREEN) 
+
+        # Manage LED 
+        if lorawan.isInSimulation() :
+            led.pulse(LED.RED,500)
+        led.setState(LED.GREEN)
+
 
 
 except Exception as err:
