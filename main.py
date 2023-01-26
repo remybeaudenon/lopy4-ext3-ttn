@@ -12,7 +12,7 @@ from ws2812led import LED
 from lorawan import LoRaWAN, ENUM_GATEWAY
 from logger import  LOGGER
 
-__version__ = "V1.0-0"
+__version__ = "V1.0-1"
 LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
 
 # --- Capteur Type 
@@ -78,7 +78,7 @@ try :
         # Manage LED 
         if lorawan.isInSimulation() :
             led.pulse(LED.RED,500)
-        led.setState(LED.GREEN)
+        led.pulse(LED.GREEN)
 
 
 

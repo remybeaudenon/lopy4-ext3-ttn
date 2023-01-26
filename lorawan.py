@@ -89,6 +89,7 @@ class LoRaWAN(LoRa) :
                 # LoRa Duty cycle applied 
                 LED.getInstance().setState(LED.INDIGO)
                 time.sleep(30)  
+                LED.getInstance().setState(LED.OFF)
 
             elif len(telegram) < LoRaWAN.PAYLOAD_MAX_SIZE :
                 LOGGER.log('LoRaWAN:send()','Push LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
@@ -99,7 +100,9 @@ class LoRaWAN(LoRa) :
 
                 # LoRa Duty cycle applied 
                 LED.getInstance().setState(LED.INDIGO)
-                time.sleep(60)  
+                time.sleep(60) 
+                LED.getInstance().setState(LED.OFF)
+ 
 
             else : 
                 LOGGER.log('LoRaWAN:send()','ERROR!! Payload size error : {}'.format(len(telegram)  ) ) 
