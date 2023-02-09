@@ -1,6 +1,6 @@
 import pycom
 from time import sleep_ms
-from logger import  LOGGER
+from logger import  Logger
 
 class LED : 
 
@@ -25,7 +25,8 @@ class LED :
     def __init__(self) : 
         pycom.heartbeat(False)
         LED.__instance = self
-        LOGGER.log('LED:init()','Init instance')
+        logger = Logger.getInstance()
+        logger.log('LED:init()','Init instance')
 
     @classmethod
     def getInstance(cls):

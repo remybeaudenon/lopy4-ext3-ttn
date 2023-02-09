@@ -1,6 +1,6 @@
 from network import LoRa
 from ws2812led import LED
-from logger import  LOGGER
+from logger import  Logger
 
 import socket
 import time
@@ -23,6 +23,8 @@ class LoRaWAN(LoRa) :
 
         self.socket = None
 
+        self.logger = Logger.getInstance()    
+
         # Init LoRa Mode & Region 
         LoRa(mode=LoRa.LORAWAN, region=LoRa.EU868,adr=True)
 
@@ -32,7 +34,7 @@ class LoRaWAN(LoRa) :
 
         self.simulation = False
         # DevEUI :  70-b3-d5-49-98-fa-f7-0f
-        LOGGER.log('LoRaWAN:init()','DevEUI : {}'.format(self.dev_eui))
+        self.logger.log('LoRaWAN:init()','DevEUI : {}'.format(self.dev_eui))
 
     def join(self,gateway) : 
 
@@ -48,17 +50,17 @@ class LoRaWAN(LoRa) :
         try_index = 3
         while not super().has_joined() and try_index > 0 :
             time.sleep(5)
-            LOGGER.log('LoRaWAN:join()','Not yet joined awaiting..{} gateway try:{}'.format(gateway_code,try_index))
+            self.logger.log('LoRaWAN:join()','Not yet joined awaiting..{} gateway try:{}'.format(gateway_code,try_index))
             try_index -=1
         time.sleep(3)
 
         if  try_index == 0 : 
-            LOGGER.log('LoRaWAN:join()','Error Gateway Join() MODE SIMULATION activated!!! ') 
+            self.logger.log('LoRaWAN:join()','Error Gateway Join() MODE SIMULATION activated!!! ') 
             self.setSimulation(True)
             LED.getInstance().pulse(LED.RED,3000)
 
         else :
-            LOGGER.log('LoRaWAN:join()','CONNECTED !! to LoRa station ' ) 
+            self.logger.log('LoRaWAN:join()','CONNECTED !! to LoRa station ' ) 
             # create a LoRa socket
             time.sleep(1)
             self.socket = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
@@ -72,7 +74,7 @@ class LoRaWAN(LoRa) :
         pass
 
     def setSimulation(self,state) : 
-        LOGGER.log('LoRaWAN:setSimulation()','MODE SIMULATION activé !!! ') 
+        self.logger.log('LoRaWAN:setSimulation()','MODE SIMULATION activé !!! ') 
         self.simulation = state    
 
     def isInSimulation(self) : 
@@ -83,7 +85,7 @@ class LoRaWAN(LoRa) :
         if isinstance(telegram, bytearray) or isinstance(telegram, bytes) :
 
             if self.simulation : 
-                LOGGER.log('LoRaWAN:send()','Push  SIMULATION LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
+                self.logger.log('LoRaWAN:send()','Push  SIMULATION LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
                 LED.getInstance().setState(LED.CYAN)
                 time.sleep(2)  
                 # LoRa Duty cycle applied 
@@ -92,7 +94,7 @@ class LoRaWAN(LoRa) :
                 LED.getInstance().setState(LED.OFF)
 
             elif len(telegram) < LoRaWAN.PAYLOAD_MAX_SIZE :
-                LOGGER.log('LoRaWAN:send()','Push LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
+                self.logger.log('LoRaWAN:send()','Push LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
                 LED.getInstance().setState(LED.CYAN)
                 self.socket.setblocking(True)
                 lg = self.socket.send(telegram)
@@ -105,6 +107,6 @@ class LoRaWAN(LoRa) :
  
 
             else : 
-                LOGGER.log('LoRaWAN:send()','ERROR!! Payload size error : {}'.format(len(telegram)  ) ) 
+                self.logger.log('LoRaWAN:send()','ERROR!! Payload size error : {}'.format(len(telegram)  ) ) 
         else :
-            LOGGER.log('LoRaWAN:send()','ERROR!! Payload format not bytearray or bytes: {}'.format( telegram) ) 
+            self.logger.log('LoRaWAN:send()','ERROR!! Payload format not bytearray or bytes: {}'.format( telegram) ) 

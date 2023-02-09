@@ -10,10 +10,9 @@ import time,sys,os
 # application package 
 from ws2812led import LED
 from lorawan import LoRaWAN, ENUM_GATEWAY
-from logger import  LOGGER
+from logger import  Logger
 
-__version__ = "V1.0-1"
-LOGGER.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
+__version__ = "V1.1-0209"
 
 # --- Capteur Type 
 class ENUM_TP:
@@ -23,6 +22,9 @@ class ENUM_TP:
 #  --- Functions   ---
 
 #  --- Initialization objects   ---
+logger = Logger.getInstance()
+logger.log('MAIN:main()','<<<--- START PROGRAM soft version:{} firmware:{} --->>>'.format(__version__,os.uname().release))
+
 led = LED()
 #lorawan = LoRaWAN(ENUM_GATEWAY.HUA[0]) 
 lorawan = LoRaWAN() 
@@ -38,7 +40,7 @@ elif ENUM_TP.TC47 :
 led.setState(LED.BLUE)  
 lorawan.join(ENUM_GATEWAY.CGA) 
 
-LOGGER.log('MAIN:main()','Loop Started !!!'  ) 
+logger.log('MAIN:main()','Loop Started !!!'  ) 
 
 ping_activity   = 0 
 ping_delay      = 3600  
@@ -59,19 +61,19 @@ try :
         payload  = sensor1.process()
         if isinstance(payload, dict) :    
             # Push data 
-            LOGGER.log('MAIN:main()','Sensor new push "Event activity" : {}'.format(payload) )
+            logger.log('MAIN:main()','Sensor new push "Event activity" : {}'.format(payload) )
             lorawan.send(sensor1.getHexPayload(payload))
             ping_activity = 0 
         elif ping_activity > ping_delay : 
             payload = sensor1.getPayload()
-            payload['event'] = 'P'
-            LOGGER.log('MAIN:main()','Sensor new push "Ping activity" : {}'.format(payload) )
+            payload['event'] = 'E'
+            logger.log('MAIN:main()','Sensor new push "Ping activity" : {}'.format(payload) )
             # Push data  
             lorawan.send(sensor1.getHexPayload(payload))
             ping_activity = 0 
     
         else :
-            LOGGER.log('MAIN:main()','Sensor low temp. variation: {}'.format(payload) ) 
+            logger.log('MAIN:main()','Sensor low temp. variation: {}'.format(payload) ) 
             ping_activity += sleep_delay
             time.sleep(sleep_delay)
 
@@ -83,8 +85,8 @@ try :
 
 
 except Exception as err:
-    LOGGER.log('MAIN:main()','Exception  {}'.format(err)) 
-    LOGGER.log('MAIN:main()','stack trace {}'.format(sys.print_exception(err)) ) 
+    logger.log('MAIN:main()','Exception  {}'.format(err)) 
+    logger.log('MAIN:main()','stack trace {}'.format(sys.print_exception(err)) ) 
 
 finally :
     led.setState(LED.OFF)

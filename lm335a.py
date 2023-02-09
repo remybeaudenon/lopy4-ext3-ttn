@@ -11,24 +11,26 @@ adc_pin = adc.channel(pin='P16',attn=machine.ADC.ATTN_11DB)   # create an analog
 """
 from machine import ADC, Timer
 from struct import pack
-from logger import  LOGGER
+from logger import  Logger
 
 class LM335A : 
     """ LM335A Temperatrue Sensor Class  """
     class StackData : 
         SIZE = 6
         def __init__(self):
-            self.buffer = []    
-            LOGGER.log('LM335A:StackData:init()','buffer: {}'.format(self.buffer))
+            self.buffer = []   
+            self.logger = Logger.getInstance()    
+ 
+            self.logger.log('LM335A:StackData:init()','buffer: {}'.format(self.buffer))
 
         def push(self,value):
             if not isinstance(value, float) :
-                LOGGER.log('LM335A:StackData:push()','bad value format {}'.format(value)  )
+                self.logger.log('LM335A:StackData:push()','bad value format {}'.format(value)  )
             else : 
                 if len(self.buffer) >= LM335A.StackData.SIZE : 
                     self.buffer.pop(0)       
                 self.buffer.append(value)
-                LOGGER.log('LM335A:StackData:push()','value:{} buffer:{}'.format(value, self.buffer))
+                self.logger.log('LM335A:StackData:push()','value:{} buffer:{}'.format(value, self.buffer))
 
         def getAvgValue(self):
             items = len(self.buffer) 
@@ -56,7 +58,7 @@ class LM335A :
         self.stack = LM335A.StackData()
 
         self.__alarm = Timer.Alarm(self._top_handler, sampling_point , periodic=True)
-        LOGGER.log('LM335A:init()','Pin:{}  sampling:{} Sec. '.format(pin,sampling_point) )
+        self.logger.log('LM335A:init()','Pin:{}  sampling:{} Sec. '.format(pin,sampling_point) )
 
     def _top_handler(self, alarm) : 
         self.read()
@@ -84,7 +86,7 @@ class LM335A :
         if (self.default == 0 ) : 
             self.stack.push(self.value)
         else : 
-            LOGGER.log('LM335A:read()','ERROR: default:{}'.format(self.default) )
+            self.logger.log('LM335A:read()','ERROR: default:{}'.format(self.default) )
 
     def process(self) : 
 
@@ -94,11 +96,11 @@ class LM335A :
         # 'E'vent on default 
         if ( self.default ^ self.default_last ) :
             self.default_last = self.default
-            LOGGER.log('LM335A:process()','New default: {}'.format(self.default) ) 
+            self.logger.log('LM335A:process()','New default: {}'.format(self.default) ) 
             return self.getPayload()
         elif abs(self.stack.getAvgValue() - self.value_last)  >= LM335A.DELTA_TEMP :
             self.value_last = self.value 
-            LOGGER.log('LM335A:process()','Sensor new Temp. value: {}'.format(self.value) )
+            self.logger.log('LM335A:process()','Sensor new Temp. value: {}'.format(self.value) )
             return self.getPayload()
         else : 
             return None

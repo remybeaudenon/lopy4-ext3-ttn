@@ -16,7 +16,7 @@ import utime
 from machine import Timer,I2C, Pin
 
 from struct import pack
-from logger import  LOGGER
+from logger import  Logger
 
 #region Commands
 _CFG_REG = 0x01
@@ -48,17 +48,18 @@ class TC74 :
     class StackData : 
         SIZE = 3
         def __init__(self):
-            self.buffer = []    
-            LOGGER.log('TC74:StackData:init()','buffer: {}'.format(self.buffer))
+            self.buffer = []
+            self.logger = Logger.getInstance()    
+            self.logger.log('TC74:StackData:init()','buffer: {}'.format(self.buffer))
 
         def push(self,value):
             if not isinstance(value, float) :
-                LOGGER.log('TC74:StackData:push()','bad value format {}'.format(value)  )
+                self.logger.log('TC74:StackData:push()','bad value format {}'.format(value)  )
             else : 
                 if len(self.buffer) >= TC74.StackData.SIZE : 
                     self.buffer.pop(0)       
                 self.buffer.append(value)
-                LOGGER.log('TC74:StackData:push()','input value:{} buffer:{} ==> avg:{} '.format(value, self.buffer,self.getAvgValue()))
+                self.logger.log('TC74:StackData:push()','input value:{} buffer:{} ==> avg:{} '.format(value, self.buffer,self.getAvgValue()))
 
         def getAvgValue(self):
             items = len(self.buffer) 
@@ -70,7 +71,7 @@ class TC74 :
         def isReady(self) :
             return (len(self.buffer) >= TC74.StackData.SIZE )
 
-    DELTA_TEMP      = 0.5 # ° 
+    DELTA_TEMP      = 1.0 # ° 
     I2C_FREQUENCE   = 400000
     VARIANT         = ENUM_VARIANT
     UNIT            = ENUM_UNIT
@@ -80,6 +81,8 @@ class TC74 :
         self.value = 0.0
         self.default = 0
 
+        self.logger = Logger.getInstance()    
+
         self.value_last = self.value
         self.default_last = self.default
 
@@ -88,7 +91,7 @@ class TC74 :
         
         self.stack = TC74.StackData()
         self.__alarm = Timer.Alarm(self._top_handler, sampling_point , periodic=True)
-        LOGGER.log('TC74:init()','name:{} variant:{} sampling:{} '.format(name,hex(variant), sampling_point) )
+        self.logger.log('TC74:init()','name:{} variant:{} sampling:{} '.format(name,hex(variant), sampling_point) )
 
     def _top_handler(self, alarm) : 
 
@@ -122,7 +125,7 @@ class TC74 :
         if (self.default == 0 ) : 
             self.stack.push(self.value)
         else : 
-            LOGGER.log('TC74:read()','ERROR: default:{}'.format(self.default) )
+            self.logger.log('TC74:read()','ERROR: default:{}'.format(self.default) )
 
     def _extract_value_from_buffer(self, temp, unit):
         # --- Two's complement conversion ---
@@ -176,11 +179,11 @@ class TC74 :
         # 'E'vent on default 
         if ( self.default ^ self.default_last ) :
             self.default_last = self.default
-            LOGGER.log('TC74:process()','New default: {}'.format(self.default) ) 
+            self.logger.log('TC74:process()','New default: {}'.format(self.default) ) 
             return payload
         elif abs(avg_temp_value - self.value_last)  >= TC74.DELTA_TEMP :
             self.value_last = avg_temp_value
-            LOGGER.log('TC74:process()','Sensor new Temp. value: {}'.format(avg_temp_value) )
+            self.logger.log('TC74:process()','Sensor new Temp. value: {}'.format(avg_temp_value) )
             return payload
         else : 
             return 'avg_temp_value:{} value_last:{} hysteresis:{}'.format(avg_temp_value,self.value_last,TC74.DELTA_TEMP)
