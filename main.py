@@ -12,7 +12,7 @@ from ws2812led import LED
 from lorawan import LoRaWAN, ENUM_GATEWAY
 from logger import  Logger
 
-__version__ = "V1.1-0209"
+__version__ = "V1.1-0304"
 
 # --- Capteur Type 
 class ENUM_TP:
@@ -73,7 +73,7 @@ try :
             ping_activity = 0 
     
         else :
-            logger.log('MAIN:main()','Sensor low temp. variation: {}'.format(payload) ) 
+            # logger.log('MAIN:main()','Sensor low temp. variation: {}'.format(payload) ) 
             ping_activity += sleep_delay
             time.sleep(sleep_delay)
 

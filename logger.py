@@ -92,6 +92,10 @@ class Logger(Persist) :
             self.ctx_file["index"] = index
         except ValueError as VE :
             pycom.nvs_set(Logger.NVS_INDEX, 0) 
+            try :
+                os.remove(""+self.path + self.getLogFileName() )
+            except OSError as ex :
+                    pass
 
     def checkFileSize(self) :
         fileSize = 0

@@ -59,7 +59,7 @@ class TC74 :
                 if len(self.buffer) >= TC74.StackData.SIZE : 
                     self.buffer.pop(0)       
                 self.buffer.append(value)
-                self.logger.log('TC74:StackData:push()','input value:{} buffer:{} ==> avg:{} '.format(value, self.buffer,self.getAvgValue()))
+                #self.logger.log('TC74:StackData:push()','input value:{} buffer:{} ==> avg:{} '.format(value, self.buffer,self.getAvgValue()))
 
         def getAvgValue(self):
             items = len(self.buffer) 
