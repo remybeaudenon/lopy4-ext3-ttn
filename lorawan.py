@@ -47,11 +47,11 @@ class LoRaWAN(LoRa) :
 
         super().join(activation=LoRa.OTAA,auth=(app_eui,app_key),timeout=0,dr=0)
 
-        try_index = 3
-        while not super().has_joined() and try_index > 0 :
-            time.sleep(5)
+        try_index = 1
+        while not super().has_joined() and try_index < 20 :
+            time.sleep(5+(10*try_index))
             self.logger.log('LoRaWAN:join()','Not yet joined awaiting..{} gateway try:{}'.format(gateway_code,try_index))
-            try_index -=1
+            try_index +=1
         time.sleep(3)
 
         if  try_index == 0 : 
@@ -60,7 +60,7 @@ class LoRaWAN(LoRa) :
             LED.getInstance().pulse(LED.RED,3000)
 
         else :
-            self.logger.log('LoRaWAN:join()','CONNECTED !! to LoRa station ' ) 
+            self.logger.log('LoRaWAN:join()','CONNECTED !!! to LoRa station ' ) 
             # create a LoRa socket
             time.sleep(1)
             self.socket = socket.socket(socket.AF_LORA, socket.SOCK_RAW)

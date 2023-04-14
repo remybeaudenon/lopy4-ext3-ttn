@@ -1,4 +1,4 @@
-import utime,os,pycom 
+import utime,os,pycom,_thread 
 from machine import SD,Timer
 
 class Persist :
@@ -8,6 +8,7 @@ class Persist :
     def __init__(self, persist = '/flash',  subDir = '/logs' , file = 'app-00.log' ):
         self.file = file
         self.dir = subDir
+        self.lock = _thread.allocate_lock()
         self.persist = persist
         if ( persist == Persist.TypeSD ) :
             if (Persist.sd == None) :
@@ -91,10 +92,11 @@ class Logger(Persist) :
             index = pycom.nvs_get(Logger.NVS_INDEX) 
             self.ctx_file["index"] = index
         except ValueError as VE :
-            pycom.nvs_set(Logger.NVS_INDEX, 0) 
-            try :
-                os.remove(""+self.path + self.getLogFileName() )
-            except OSError as ex :
+            pycom.nvs_set(Logger.NVS_INDEX, 0)
+            with self.lock : 
+                try :
+                    os.remove(""+self.path + self.getLogFileName() )
+                except OSError as ex :
                     pass
 
     def checkFileSize(self) :
