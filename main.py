@@ -12,7 +12,7 @@ from ws2812led import LED
 from lorawan import LoRaWAN, ENUM_GATEWAY
 from logger import  Logger
 
-__version__ = "V1.1-0414"
+__version__ = "V1.1-0705"
 
 # --- Capteur Type 
 class ENUM_TP:

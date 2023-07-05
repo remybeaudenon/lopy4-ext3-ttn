@@ -49,6 +49,10 @@ class LoRaWAN(LoRa) :
 
         try_index = 1
         while not super().has_joined() and try_index < 20 :
+
+            if try_index % 5 == 0  :
+                super().join(activation=LoRa.OTAA,auth=(app_eui,app_key),timeout=0,dr=0)
+
             time.sleep(5+(10*try_index))
             self.logger.log('LoRaWAN:join()','Not yet joined awaiting..{} gateway try:{}'.format(gateway_code,try_index))
             try_index +=1
