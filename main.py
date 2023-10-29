@@ -38,7 +38,7 @@ elif ENUM_TP.TC47 :
     sensor1 = TC74('P9','P10','sensor tc74')    # Pin  default Sampling read 10 sec. 
 
 led.setState(LED.BLUE)  
-lorawan.join(ENUM_GATEWAY.CGA) 
+lorawan.join(ENUM_GATEWAY.TTN) 
 
 logger.log('MAIN:main()','Loop Started !!!'  ) 
 
