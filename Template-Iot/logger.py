@@ -71,8 +71,6 @@ class Logger(Persist) :
         else :
             self.__alarm = None    
 
-        self._loadCtxParameters() 
-
         Logger.__instance = self
 
     def _minutes_handler(self, alarm):

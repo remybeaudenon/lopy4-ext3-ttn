@@ -1,7 +1,7 @@
 """
     POLYTEC - ecoleiot.fr
     Project      : FullStack TP   
-    Application  : LM335A /TC74  Temperature sensor on HUA+LoRa Mutlitech / TTN  gateway  
+    Application  : LM335A /TC74  Temperature sensor on LoRa Mutlitech / TTN  gateway  
     Auth         : remybeaudenon@yahoo.com                 
     Date         : 12/2024 
 """
