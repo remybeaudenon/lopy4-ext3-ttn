@@ -68,7 +68,7 @@ class LoRaWAN(LoRa) :
             # create a LoRa socket
             time.sleep(1)
             self.socket = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
-            self.socket.settimeout(3)
+            self.socket.settimeout(15)
             # set the LoRaWAN data rate
             self.socket.setsockopt(socket.SOL_LORA, socket.SO_DR, 0)
             # selecting non-confirmed type of messages
@@ -100,8 +100,24 @@ class LoRaWAN(LoRa) :
             elif len(telegram) < LoRaWAN.PAYLOAD_MAX_SIZE :
                 self.logger.log('LoRaWAN:send()','Push LoRa Payload:[{}] device eui:{} '.format(telegram,self.dev_eui )  ) 
                 LED.getInstance().setState(LED.CYAN)
+
+                self.logger.log('LoRaWAN:send()','Blocking True') 
                 self.socket.setblocking(True)
-                lg = self.socket.send(telegram)
+
+                loop = True 
+                while (loop) : 
+                    try : 
+                        self.logger.log('LoRaWAN:send()','Send Data') 
+                        lg = self.socket.send(telegram)
+                        loop = False    
+                    except OSError as oes : 
+                        if oes.args[0] == 11:  # EAGAIN
+                            self.logger.log('LoRaWAN:send()','Error EAGAIN #11 ') 
+                            time.sleep(0.5)    # Wait and retry
+                        else : 
+                            raise      
+
+                self.logger.log('LoRaWAN:send()','Blocking False') 
                 self.socket.setblocking(False)
 
                 # get any data received (if any...)

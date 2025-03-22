@@ -33,7 +33,7 @@ s = socket.socket(socket.AF_LORA, socket.SOCK_RAW)
 # set the LoRaWAN data rate
 s.setsockopt(socket.SOL_LORA, socket.SO_DR, 0)
 
-count = 10
+count = 5
 idx = 0 
 while idx < count  : 
     # make the socket blocking
@@ -41,15 +41,19 @@ while idx < count  :
     s.setblocking(True)
 
     # send some data
-    print('send data..[123]  idx:{}/{}'.format(idx,count))
-    rc = s.send(b'123')
-    print('sent {} bytes'.format(rc))
+    #print('send data..[123]  idx:{}/{}'.format(idx,count))
+    #rc = s.send(b'123')
 
+    payload = bytearray(0)
+    payload.extend( bytearray( b'\x01\x45\x03\x00\x02\x36\x01')) #  
+    rc = s.send(payload)
+    print('sent {} {} bytes'.format(payload, rc))
+   
     # make the socket non-blocking
     # (because if there's no data received it will block forever...)
     s.setblocking(False)
 
-    print("OK") 
+    print("Sent !") 
     idx +=1 
     time.sleep(60)
 

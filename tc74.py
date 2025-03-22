@@ -6,8 +6,9 @@
 # Temperature resolution is 1°C
 # TC74A0-3.3VCT ==> Slave Address 0x48  
 # from tc74 import TC74
-# >>> tc74 = TC74(TC74.VARIANT.A0)
 # >>> tc74.init(scl= 'P10', sda= 'P9')
+# >>> tc74 = TC74(sda ='P9',scl='P10',name = 'sensor tc74') 
+
 # >>> tc74.read_temp(tc74.UNIT.Celsius)
 # 17
 """
@@ -59,7 +60,7 @@ class TC74 :
                 if len(self.buffer) >= TC74.StackData.SIZE : 
                     self.buffer.pop(0)       
                 self.buffer.append(value)
-                #self.logger.log('TC74:StackData:push()','input value:{} buffer:{} ==> avg:{} '.format(value, self.buffer,self.getAvgValue()))
+                self.logger.log('TC74:StackData:push()','input value:{} buffer:{} ==> avg:{} '.format(value, self.buffer,self.getAvgValue()))
 
         def getAvgValue(self):
             items = len(self.buffer) 

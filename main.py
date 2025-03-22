@@ -43,7 +43,7 @@ lorawan.join(ENUM_GATEWAY.TTN)
 logger.log('MAIN:main()','Loop Started !!!'  ) 
 
 ping_activity   = 0 
-ping_delay      = 3600  
+ping_delay      = 360  
 
 sleep_delay = 10 
 
