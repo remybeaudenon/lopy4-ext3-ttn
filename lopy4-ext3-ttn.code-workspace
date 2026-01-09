@@ -6,6 +6,10 @@
 		{
 			"name": "serial:/COM9",
 			"uri": "serial://com9/"
+		},
+		{
+			"name": "STM8S105-discovery",
+			"path": "../../../Users/remyb/Documents/PlatformIO/Projects/STM8S105-discovery"
 		}
 	],
 	"settings": {}
