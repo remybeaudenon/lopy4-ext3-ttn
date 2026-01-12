@@ -15,7 +15,7 @@ from logger import  Logger
 
 __version__ = "V1.2-0102"
 
-# --- Capteur Type 
+# --- Implemented Sensor Type 
 class ENUM_TP:
     TC47    = True
     LM335A  = False
@@ -44,7 +44,7 @@ lorawan.join(ENUM_GATEWAY.TTN)
 logger.log('MAIN:main()','Loop Started !!!'  ) 
 
 ping_activity   = 0 
-ping_delay      = 3600  
+ping_delay      = 360 
 
 sleep_delay = 10 
 
